@@ -8,6 +8,7 @@ import (
 	"log"
 	"os"
 	"sort"
+	"unicode"
 )
 
 func ReadFile(path string) (bytes []byte, err error) {
@@ -17,7 +18,19 @@ func ReadFile(path string) (bytes []byte, err error) {
 	}
 	reader := bufio.NewReader(file)
 	bytes, err = ioutil.ReadAll(reader)
-	return bytes, err
+
+	//[Golang rune []byte string 的相互转换_次元代码-CSDN博客](https://blog.csdn.net/dengming0922/article/details/80883574)
+	//[golang - 如何判断字符是不是中文？ - SegmentFault 思否](https://segmentfault.com/q/1010000000595663)
+	r := []rune(string(bytes))
+	var bytesIsHan []rune
+	for _, ru := range r {
+		// 判断字符是否是汉字
+		if unicode.Is(unicode.Han, ru) {
+			bytesIsHan = append(bytesIsHan, ru)
+		}
+	}
+
+	return []byte(string(bytesIsHan)), err
 }
 
 func SplitWord(bytes []byte) []string {
@@ -62,6 +75,7 @@ func main() {
 
 	wordFrequencyMap := make(map[string]int)
 	for _, word := range words {
+
 		if value, ok := wordFrequencyMap[word]; ok {
 			wordFrequencyMap[word] = value + 1
 		} else {
