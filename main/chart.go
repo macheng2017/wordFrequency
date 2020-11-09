@@ -1,22 +1,24 @@
 package main
 
 import (
+	"fmt"
 	"github.com/go-echarts/go-echarts/v2/charts"
 	"github.com/go-echarts/go-echarts/v2/opts"
-	"math/rand"
 	"os"
 )
 
+const wordCount = 30
+
 // generate random data for bar chart
-func generateBarItems() []opts.BarData {
+func generateBarItems(list PairList) []opts.BarData {
 	items := make([]opts.BarData, 0)
-	for i := 0; i < 7; i++ {
-		items = append(items, opts.BarData{Value: rand.Intn(300)})
+	for i := 0; i < wordCount; i++ {
+		items = append(items, opts.BarData{Value: list[i].Value})
 	}
 	return items
 }
 
-func main() {
+func CreateChart(list PairList) {
 	// create a new bar instance
 	bar := charts.NewBar()
 
@@ -26,6 +28,10 @@ func main() {
 			Title:    "格林童话中的词频",
 			Subtitle: "This is the subtitle.",
 		}),
+		charts.WithInitializationOpts(opts.Initialization{
+			Width:  "1200px",
+			Height: "600px",
+		}),
 	)
 
 	// iowriter
@@ -33,12 +39,16 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-
+	var keys []string
+	for i := 0; i < wordCount; i++ {
+		keys = append(keys, list[i].Key)
+	}
+	fmt.Println(keys)
 	// Put some data in instance
-	bar.SetXAxis([]string{"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"}).
-		AddSeries("Category A", generateBarItems()).
-		AddSeries("Category B", generateBarItems())
+	bar.SetXAxis(keys).
+		AddSeries("Category A", generateBarItems(list))
 
 	// Where the magic happens
 	bar.Render(f)
+
 }

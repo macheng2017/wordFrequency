@@ -37,18 +37,19 @@ func SplitWord(bytes []byte) []string {
 	x := gojieba.NewJieba()
 	defer x.Free()
 	var words []string
-	words = x.CutAll(string(bytes))
+	//words = x.CutAll(string(bytes))
+	words = x.Cut(string(bytes), true)
 	//fmt.Println("全模式:", strings.Join(words, "/"))
 	//fmt.Printf("font size %d", len(words))
 	return words
 }
 
 // 使用struct 灌入map的数据对value进行排序，必须实现sort接口
-func rankByWordCount(wordFrequencies map[string]int) PairList {
+func rankByWordCount(wordFrequencies map[string]interface{}) PairList {
 	pl := make(PairList, len(wordFrequencies))
 	i := 0
 	for k, v := range wordFrequencies {
-		pl[i] = Pair{k, v}
+		pl[i] = Pair{k, v.(int)}
 		i++
 	}
 	sort.Sort(sort.Reverse(pl))
@@ -67,22 +68,25 @@ func (p PairList) Less(i, j int) bool { return p[i].Value < p[j].Value }
 func (p PairList) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
 
 func main() {
-	bytes, err := ReadFile("./doc/gelin.txt")
+	bytes, err := ReadFile("./doc/antu.txt")
 	if err != nil {
 		log.Fatal(err)
 	}
 	words := SplitWord(bytes)
 
-	wordFrequencyMap := make(map[string]int)
+	wordFrequencyMap := make(map[string]interface{})
 	for _, word := range words {
 
 		if value, ok := wordFrequencyMap[word]; ok {
-			wordFrequencyMap[word] = value + 1
+			wordFrequencyMap[word] = value.(int) + 1
 		} else {
 			wordFrequencyMap[word] = 1
 		}
 	}
 	pairList := rankByWordCount(wordFrequencyMap)
 	fmt.Print(pairList)
+	examples := WordcloudExamples{}
+	examples.Examples(wordFrequencyMap)
+	CreateChart(pairList)
 
 }
