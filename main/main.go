@@ -10,7 +10,7 @@ import (
 	"sort"
 	"unicode"
 	chart "wordFrequency/chart"
-	sort2 "wordFrequency/sort"
+	s "wordFrequency/sort"
 )
 
 func ReadFile(path string) (bytes []byte, err error) {
@@ -35,6 +35,21 @@ func ReadFile(path string) (bytes []byte, err error) {
 	return []byte(string(bytesIsHan)), err
 }
 
+func WriteFile(filePath string, pairList s.PairList) error {
+	file, err := os.OpenFile(filePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	writer := bufio.NewWriter(file)
+	defer writer.Flush()
+	for _, s := range pairList {
+		fmt.Fprint(writer, "\n", s)
+	}
+	return nil
+}
+
 func SplitWord(bytes []byte) []string {
 	x := gojieba.NewJieba()
 	defer x.Free()
@@ -47,11 +62,11 @@ func SplitWord(bytes []byte) []string {
 }
 
 // 使用struct 灌入map的数据对value进行排序，必须实现sort接口
-func rankByWordCount(wordFrequencies map[string]interface{}) sort2.PairList {
-	pl := make(sort2.PairList, len(wordFrequencies))
+func rankByWordCount(wordFrequencies map[string]interface{}) s.PairList {
+	pl := make(s.PairList, len(wordFrequencies))
 	i := 0
 	for k, v := range wordFrequencies {
-		pl[i] = sort2.Pair{k, v.(int)}
+		pl[i] = s.Pair{k, v.(int)}
 		i++
 	}
 	sort.Sort(sort.Reverse(pl))
@@ -59,7 +74,7 @@ func rankByWordCount(wordFrequencies map[string]interface{}) sort2.PairList {
 }
 
 func main() {
-	bytes, err := ReadFile("./doc/gelin.txt")
+	bytes, err := ReadFile("./doc/keben.txt")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -75,7 +90,8 @@ func main() {
 		}
 	}
 	pairList := rankByWordCount(wordFrequencyMap)
-	fmt.Print(pairList)
+	fmt.Println(pairList)
+	WriteFile("out/result.txt", pairList)
 	examples := chart.WordcloudExamples{}
 	examples.Examples(wordFrequencyMap)
 	chart.CreateChart(pairList)

@@ -30,7 +30,7 @@ func CreateChart(list sort.PairList) {
 			Subtitle: "This is the subtitle.",
 		}),
 		charts.WithInitializationOpts(opts.Initialization{
-			Width:  "1200px",
+			Width:  "1800px",
 			Height: "600px",
 		}),
 	)
