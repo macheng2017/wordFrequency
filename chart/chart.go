@@ -1,16 +1,17 @@
-package main
+package chart
 
 import (
 	"fmt"
 	"github.com/go-echarts/go-echarts/v2/charts"
 	"github.com/go-echarts/go-echarts/v2/opts"
 	"os"
+	"wordFrequency/sort"
 )
 
 const wordCount = 30
 
 // generate random data for bar chart
-func generateBarItems(list PairList) []opts.BarData {
+func generateBarItems(list sort.PairList) []opts.BarData {
 	items := make([]opts.BarData, 0)
 	for i := 0; i < wordCount; i++ {
 		items = append(items, opts.BarData{Value: list[i].Value})
@@ -18,7 +19,7 @@ func generateBarItems(list PairList) []opts.BarData {
 	return items
 }
 
-func CreateChart(list PairList) {
+func CreateChart(list sort.PairList) {
 	// create a new bar instance
 	bar := charts.NewBar()
 

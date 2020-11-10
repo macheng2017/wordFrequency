@@ -9,6 +9,8 @@ import (
 	"os"
 	"sort"
 	"unicode"
+	chart "wordFrequency/chart"
+	sort2 "wordFrequency/sort"
 )
 
 func ReadFile(path string) (bytes []byte, err error) {
@@ -45,30 +47,19 @@ func SplitWord(bytes []byte) []string {
 }
 
 // 使用struct 灌入map的数据对value进行排序，必须实现sort接口
-func rankByWordCount(wordFrequencies map[string]interface{}) PairList {
-	pl := make(PairList, len(wordFrequencies))
+func rankByWordCount(wordFrequencies map[string]interface{}) sort2.PairList {
+	pl := make(sort2.PairList, len(wordFrequencies))
 	i := 0
 	for k, v := range wordFrequencies {
-		pl[i] = Pair{k, v.(int)}
+		pl[i] = sort2.Pair{k, v.(int)}
 		i++
 	}
 	sort.Sort(sort.Reverse(pl))
 	return pl
 }
 
-type Pair struct {
-	Key   string
-	Value int
-}
-
-type PairList []Pair
-
-func (p PairList) Len() int           { return len(p) }
-func (p PairList) Less(i, j int) bool { return p[i].Value < p[j].Value }
-func (p PairList) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
-
 func main() {
-	bytes, err := ReadFile("./doc/antu.txt")
+	bytes, err := ReadFile("./doc/gelin.txt")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -85,8 +76,8 @@ func main() {
 	}
 	pairList := rankByWordCount(wordFrequencyMap)
 	fmt.Print(pairList)
-	examples := WordcloudExamples{}
+	examples := chart.WordcloudExamples{}
 	examples.Examples(wordFrequencyMap)
-	CreateChart(pairList)
+	chart.CreateChart(pairList)
 
 }

@@ -1,4 +1,4 @@
-package main
+package chart
 
 import (
 	"io"
@@ -123,5 +123,4 @@ func (WordcloudExamples) Examples(wcData map[string]interface{}) {
 		panic(err)
 	}
 	page.Render(io.MultiWriter(f))
-
 }
